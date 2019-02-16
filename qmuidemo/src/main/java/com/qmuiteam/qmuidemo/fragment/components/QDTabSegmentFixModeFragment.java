@@ -1,8 +1,24 @@
+/*
+ * Tencent is pleased to support the open source community by making QMUI_Android available.
+ *
+ * Copyright (C) 2017-2018 THL A29 Limited, a Tencent company. All rights reserved.
+ *
+ * Licensed under the MIT License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.qmuiteam.qmuidemo.fragment.components;
 
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,14 +29,14 @@ import android.widget.TextView;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.util.QMUIResHelper;
 import com.qmuiteam.qmui.widget.QMUITabSegment;
-import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
-import com.qmuiteam.qmuidemo.manager.QDDataManager;
-import com.qmuiteam.qmuidemo.base.BaseFragment;
-import com.qmuiteam.qmuidemo.model.QDItemDescription;
 import com.qmuiteam.qmuidemo.R;
+import com.qmuiteam.qmuidemo.base.BaseFragment;
 import com.qmuiteam.qmuidemo.lib.Group;
 import com.qmuiteam.qmuidemo.lib.annotation.Widget;
+import com.qmuiteam.qmuidemo.manager.QDDataManager;
+import com.qmuiteam.qmuidemo.model.QDItemDescription;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,9 +51,12 @@ import butterknife.ButterKnife;
 
 @Widget(group = Group.Other, name = "固定宽度，内容均分")
 public class QDTabSegmentFixModeFragment extends BaseFragment {
-    @BindView(R.id.topbar) QMUITopBar mTopBar;
-    @BindView(R.id.tabSegment) QMUITabSegment mTabSegment;
-    @BindView(R.id.contentViewPager) ViewPager mContentViewPager;
+    @BindView(R.id.topbar)
+    QMUITopBarLayout mTopBar;
+    @BindView(R.id.tabSegment)
+    QMUITabSegment mTabSegment;
+    @BindView(R.id.contentViewPager)
+    ViewPager mContentViewPager;
 
     private Map<ContentPage, View> mPageMap = new HashMap<>();
     private ContentPage mDestPage = ContentPage.Item1;
@@ -149,16 +168,14 @@ public class QDTabSegmentFixModeFragment extends BaseFragment {
                             case 4:
                                 mTabSegment.reset();
                                 mTabSegment.setHasIndicator(false);
-                                QMUITabSegment.Tab component = new QMUITabSegment.Tab(
-                                        ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component),
-                                        null,
-                                        "Components", true
-                                );
-                                QMUITabSegment.Tab util = new QMUITabSegment.Tab(
-                                        ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_util),
-                                        null,
-                                        "Helper", true
-                                );
+                                QMUITabSegment.Tab component = new QMUITabSegment.TabBuilder("Components")
+                                        .setNormalDrawable(ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component))
+                                        .setDynamicChangeIconColor(true)
+                                        .build();
+                                QMUITabSegment.Tab util = new QMUITabSegment.TabBuilder("Helper")
+                                        .setNormalDrawable(ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_util))
+                                        .setDynamicChangeIconColor(true)
+                                        .build();
                                 mTabSegment.addTab(component);
                                 mTabSegment.addTab(util);
                                 break;
@@ -170,16 +187,16 @@ public class QDTabSegmentFixModeFragment extends BaseFragment {
                             case 6:
                                 mTabSegment.reset();
                                 mTabSegment.setHasIndicator(false);
-                                QMUITabSegment.Tab component2 = new QMUITabSegment.Tab(
-                                        ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component),
-                                        ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component_selected),
-                                        "Components", false
-                                );
-                                QMUITabSegment.Tab util2 = new QMUITabSegment.Tab(
-                                        ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_util),
-                                        ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_util_selected),
-                                        "Helper", false
-                                );
+                                QMUITabSegment.Tab component2 = new QMUITabSegment.TabBuilder("Components")
+                                        .setNormalDrawable(ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component))
+                                        .setSelectedDrawable(ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component_selected))
+                                        .build();
+
+
+                                QMUITabSegment.Tab util2 = new QMUITabSegment.TabBuilder("Helper")
+                                        .setNormalDrawable(ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_util))
+                                        .setSelectedDrawable(ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_util_selected))
+                                        .build();
                                 mTabSegment.addTab(component2);
                                 mTabSegment.addTab(util2);
                                 break;
@@ -188,20 +205,18 @@ public class QDTabSegmentFixModeFragment extends BaseFragment {
                                 mTabSegment.setHasIndicator(true);
                                 mTabSegment.setIndicatorWidthAdjustContent(true);
                                 mTabSegment.setIndicatorPosition(false);
-                                QMUITabSegment.Tab component3 = new QMUITabSegment.Tab(
-                                        ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component),
-                                        null,
-                                        "Components", true
-                                );
-                                component3.setTextColor(QMUIResHelper.getAttrColor(getContext(), R.attr.qmui_config_color_blue),
-                                        QMUIResHelper.getAttrColor(getContext(), R.attr.qmui_config_color_red));
-                                QMUITabSegment.Tab util3 = new QMUITabSegment.Tab(
-                                        ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_util),
-                                        null,
-                                        "Helper", true
-                                );
-                                util3.setTextColor(QMUIResHelper.getAttrColor(getContext(), R.attr.qmui_config_color_gray_1),
-                                        QMUIResHelper.getAttrColor(getContext(), R.attr.qmui_config_color_red));
+                                QMUITabSegment.Tab component3 = new QMUITabSegment.TabBuilder("Components")
+                                        .setNormalDrawable(ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component))
+                                        .setDynamicChangeIconColor(true)
+                                        .setColor(QMUIResHelper.getAttrColor(getContext(), R.attr.qmui_config_color_blue),
+                                                QMUIResHelper.getAttrColor(getContext(), R.attr.qmui_config_color_red))
+                                        .build();
+                                QMUITabSegment.Tab util3 = new QMUITabSegment.TabBuilder("Helper")
+                                        .setNormalDrawable(ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_util))
+                                        .setDynamicChangeIconColor(true)
+                                        .setColor(QMUIResHelper.getAttrColor(getContext(), R.attr.qmui_config_color_gray_1),
+                                                QMUIResHelper.getAttrColor(getContext(), R.attr.qmui_config_color_red))
+                                        .build();
                                 mTabSegment.addTab(component3);
                                 mTabSegment.addTab(util3);
                                 break;
@@ -209,11 +224,10 @@ public class QDTabSegmentFixModeFragment extends BaseFragment {
                                 mTabSegment.updateTabText(0, "动态更新文案");
                                 break;
                             case 9:
-                                QMUITabSegment.Tab component4 = new QMUITabSegment.Tab(
-                                        ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component),
-                                        null,
-                                        "动态更新", true
-                                );
+                                QMUITabSegment.Tab component4 = new QMUITabSegment.TabBuilder("动态更新")
+                                        .setNormalDrawable(ContextCompat.getDrawable(getContext(), R.mipmap.icon_tabbar_component))
+                                        .setDynamicChangeIconColor(true)
+                                        .build();
                                 mTabSegment.replaceTab(0, component4);
                                 break;
 

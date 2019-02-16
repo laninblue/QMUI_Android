@@ -8,6 +8,8 @@ QMUI Android 的设计目的是用于辅助快速搭建一个具备基本设计�
 
 官网：[http://qmuiteam.com/android](http://qmuiteam.com/android)
 
+[加入我们（长期有效）](https://qmuiteam.com/join-us/)
+
 [![QMUI Team Name](https://img.shields.io/badge/Team-QMUI-brightgreen.svg?style=flat)](https://github.com/QMUI "QMUI Team")
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://opensource.org/licenses/MIT "Feel free to contribute.")
 
@@ -35,4 +37,4 @@ QMUI Android 支持 API Level 14+。
 
 或扫二维码至官网下载：
 
-![QMUI Website](http://qmuiteam.com/android/public/style/images/independent/DownloadQRCode.png?v=website)
+![QMUI Website](http://qmuiteam.com/themes/qmui/public/style/images/independent/AndroidDownloadQRCode_2x.png)

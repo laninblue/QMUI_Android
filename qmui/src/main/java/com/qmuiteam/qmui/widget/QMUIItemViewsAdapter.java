@@ -1,6 +1,22 @@
+/*
+ * Tencent is pleased to support the open source community by making QMUI_Android available.
+ *
+ * Copyright (C) 2017-2018 THL A29 Limited, a Tencent company. All rights reserved.
+ *
+ * Licensed under the MIT License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.qmuiteam.qmui.widget;
 
-import android.support.v4.util.Pools;
+import androidx.core.util.Pools;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -9,9 +25,11 @@ import com.qmuiteam.qmui.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * 一个带 cache 功能的“列表型数据-View”的适配器，适用于自定义 {@link View} 需要显示重复单元 {@link android.widget.ListView} 的情景，
- * cache 功能主要是保证在需要多次刷新数据或布局的情况下（{@link android.widget.ListView} 或 {@link android.support.v7.widget.RecyclerView} 的 itemView）
+ * cache 功能主要是保证在需要多次刷新数据或布局的情况下（{@link android.widget.ListView} 或 {@link RecyclerView} 的 itemView）
  * 复用已存在的 {@link View}。
  * QMUI 用于 {@link QMUITabSegment} 中 {@link QMUITabSegment.Tab} 与数据的适配。
  *
@@ -102,7 +120,7 @@ public abstract class QMUIItemViewsAdapter<T, V extends View> {
         if (mItemData == null) {
             return null;
         }
-        if (position < 0 || position > mItemData.size()) {
+        if (position < 0 || position >= mItemData.size()) {
             return null;
         }
         return mItemData.get(position);

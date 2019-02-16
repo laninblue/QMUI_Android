@@ -1,7 +1,23 @@
+/*
+ * Tencent is pleased to support the open source community by making QMUI_Android available.
+ *
+ * Copyright (C) 2017-2018 THL A29 Limited, a Tencent company. All rights reserved.
+ *
+ * Licensed under the MIT License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.qmuiteam.qmuidemo.base;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +31,7 @@ import java.util.List;
  */
 
 public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerViewHolder> {
-    private final List<T> mData;
+    private List<T> mData;
     private final Context mContext;
     private LayoutInflater mInflater;
     private OnItemClickListener mClickListener;
@@ -25,6 +41,11 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<Recycl
         mData = (list != null) ? list : new ArrayList<T>();
         mContext = ctx;
         mInflater = LayoutInflater.from(ctx);
+    }
+
+    public void setData(List<T> list) {
+        mData = (list != null) ? list : new ArrayList<T>();
+        notifyDataSetChanged();
     }
 
     @Override

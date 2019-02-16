@@ -1,3 +1,19 @@
+/*
+ * Tencent is pleased to support the open source community by making QMUI_Android available.
+ *
+ * Copyright (C) 2017-2018 THL A29 Limited, a Tencent company. All rights reserved.
+ *
+ * Licensed under the MIT License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.qmuiteam.qmuidemo.manager;
 
 import com.qmuiteam.qmuidemo.base.BaseFragment;
@@ -8,8 +24,10 @@ import com.qmuiteam.qmuidemo.fragment.components.QDDialogFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDEmptyViewFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDFloatLayoutFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDGroupListViewFragment;
+import com.qmuiteam.qmuidemo.fragment.components.QDLayoutFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDLinkTextViewFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDPopupFragment;
+import com.qmuiteam.qmuidemo.fragment.components.QDPriorityLinearLayoutFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDProgressBarFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDPullRefreshFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDRadiusImageViewFragment;
@@ -18,12 +36,16 @@ import com.qmuiteam.qmuidemo.fragment.components.QDTabSegmentFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDTipDialogFragment;
 import com.qmuiteam.qmuidemo.fragment.components.QDVerticalTextViewFragment;
 import com.qmuiteam.qmuidemo.fragment.components.qqface.QDQQFaceFragment;
+import com.qmuiteam.qmuidemo.fragment.components.section.QDSectionLayoutFragment;
 import com.qmuiteam.qmuidemo.fragment.components.viewpager.QDViewPagerFragment;
 import com.qmuiteam.qmuidemo.fragment.lab.QDAnimationListViewFragment;
+import com.qmuiteam.qmuidemo.fragment.lab.QDArchTestFragment;
 import com.qmuiteam.qmuidemo.fragment.lab.QDSnapHelperFragment;
+import com.qmuiteam.qmuidemo.fragment.lab.QDWebViewFixFragment;
 import com.qmuiteam.qmuidemo.fragment.util.QDColorHelperFragment;
 import com.qmuiteam.qmuidemo.fragment.util.QDDeviceHelperFragment;
 import com.qmuiteam.qmuidemo.fragment.util.QDDrawableHelperFragment;
+import com.qmuiteam.qmuidemo.fragment.util.QDNotchHelperFragment;
 import com.qmuiteam.qmuidemo.fragment.util.QDSpanFragment;
 import com.qmuiteam.qmuidemo.fragment.util.QDStatusBarHelperFragment;
 import com.qmuiteam.qmuidemo.fragment.util.QDViewHelperFragment;
@@ -84,6 +106,9 @@ public class QDDataManager {
         mComponentsNames.add(QDSpanFragment.class);
         mComponentsNames.add(QDCollapsingTopBarLayoutFragment.class);
         mComponentsNames.add(QDViewPagerFragment.class);
+        mComponentsNames.add(QDLayoutFragment.class);
+        mComponentsNames.add(QDPriorityLinearLayoutFragment.class);
+        mComponentsNames.add(QDSectionLayoutFragment.class);
     }
 
     /**
@@ -96,6 +121,7 @@ public class QDDataManager {
         mUtilNames.add(QDDrawableHelperFragment.class);
         mUtilNames.add(QDStatusBarHelperFragment.class);
         mUtilNames.add(QDViewHelperFragment.class);
+        mUtilNames.add(QDNotchHelperFragment.class);
     }
 
     /**
@@ -105,6 +131,8 @@ public class QDDataManager {
         mLabNames = new ArrayList<>();
         mLabNames.add(QDAnimationListViewFragment.class);
         mLabNames.add(QDSnapHelperFragment.class);
+        mLabNames.add(QDArchTestFragment.class);
+        mLabNames.add(QDWebViewFixFragment.class);
     }
 
     public QDItemDescription getDescription(Class<? extends BaseFragment> cls) {
@@ -117,6 +145,14 @@ public class QDDataManager {
             return null;
         }
         return itemDescription.getName();
+    }
+
+    public String getDocUrl(Class<? extends BaseFragment> cls){
+        QDItemDescription itemDescription = getDescription(cls);
+        if (itemDescription == null) {
+            return null;
+        }
+        return itemDescription.getDocUrl();
     }
 
     public List<QDItemDescription> getComponentsDescriptions() {

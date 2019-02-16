@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 group = 'com.qmuiteam'
-version = "1.0.7" // QMUI 发布到 bintray 的版本号
+version = "1.2.0" // QMUI 发布到 bintray 的版本号
 
 //noinspection GroovyMissingReturnStatement
 android {
@@ -46,14 +46,8 @@ android {
 //}
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile("com.android.support:recyclerview-v7:$supportVersion")
-    compile("com.android.support:appcompat-v7:$supportVersion")
-    compile("com.android.support:design:$supportVersion")
-    compile("com.android.support:support-vector-drawable:$supportVersion") // need Gradle Plugin v1.5.0 or above
-    //test
-//    testCompile 'junit:junit:4.12'
-//    testCompile 'org.mockito:mockito-core:1.10.19'
+    implementation "androidx.appcompat:appcompat:$appcompatVersion"
+    implementation "com.google.android.material:material:$materialVersion"
 }
 
 // deploy
