@@ -18,19 +18,15 @@ package com.qmuiteam.qmui.arch;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import androidx.arch.core.util.Function;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.core.view.ViewCompat;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -44,6 +40,15 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.core.view.ViewCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.viewpager.widget.ViewPager;
+
 import static com.qmuiteam.qmui.arch.SwipeBackLayout.EDGE_LEFT;
 
 /**
@@ -52,7 +57,7 @@ import static com.qmuiteam.qmui.arch.SwipeBackLayout.EDGE_LEFT;
  * <p>
  * Created by cgspine on 15/9/14.
  */
-public abstract class QMUIFragment extends Fragment {
+public abstract class QMUIFragment extends Fragment implements QMUIFragmentLazyLifecycleOwner.Callback {
     private static final String SWIPE_BACK_VIEW = "swipe_back_view";
     private static final String TAG = QMUIFragment.class.getSimpleName();
 
@@ -93,6 +98,7 @@ public abstract class QMUIFragment extends Fragment {
     private int mEnterAnimationStatus = ANIMATION_ENTER_STATUS_NOT_START;
     private boolean mCalled = true;
     private ArrayList<Runnable> mDelayRenderRunnableList = new ArrayList<>();
+    private QMUIFragmentLazyLifecycleOwner mLazyViewLifecycleOwner;
 
     public QMUIFragment() {
         super();
@@ -131,6 +137,7 @@ public abstract class QMUIFragment extends Fragment {
         QMUIFragmentActivity baseFragmentActivity = this.getBaseFragmentActivity();
         if (baseFragmentActivity != null) {
             if (this.isAttachedToActivity()) {
+                ViewCompat.setTranslationZ(mCacheSwipeBackLayout, --mBackStackIndex);
                 baseFragmentActivity.startFragmentAndDestroyCurrent(fragment, useNewTransitionConfigWhenPop);
             } else {
                 Log.e("QMUIFragment", "fragment not attached:" + this);
@@ -233,6 +240,14 @@ public abstract class QMUIFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mLazyViewLifecycleOwner = new QMUIFragmentLazyLifecycleOwner(this);
+        mLazyViewLifecycleOwner.setViewVisible(getUserVisibleHint());
+        getViewLifecycleOwner().getLifecycle().addObserver(mLazyViewLifecycleOwner);
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         int requestCode = mSourceRequestCode;
@@ -278,6 +293,25 @@ public abstract class QMUIFragment extends Fragment {
                         if (!canDragBack()) {
                             return false;
                         }
+
+                        if (getParentFragment() != null) {
+                            return false;
+                        }
+
+                        View view = getView();
+                        if (view == null) {
+                            return false;
+                        }
+
+                        // if the Fragment is in ViewPager, then stop drag back
+                        ViewParent parent = view.getParent();
+                        while (parent != null) {
+                            if (parent instanceof ViewPager) {
+                                return false;
+                            }
+                            parent = parent.getParent();
+                        }
+
                         FragmentManager fragmentManager = getFragmentManager();
                         if (fragmentManager == null || fragmentManager.getBackStackEntryCount() <= 1) {
                             return QMUISwipeBackActivityManager.getInstance().canSwipeBack();
@@ -344,6 +378,16 @@ public abstract class QMUIFragment extends Fragment {
 
                             return false;
                         }
+
+                        @Override
+                        public boolean needReNameTag() {
+                            return false;
+                        }
+
+                        @Override
+                        public String newTagName() {
+                            return null;
+                        }
                     });
                     popBackStack();
                 }
@@ -377,6 +421,7 @@ public abstract class QMUIFragment extends Fragment {
                 return;
             }
             QMUIKeyboardHelper.hideKeyboard(mBaseView);
+            onDragStart();
             int backStackCount = fragmentManager.getBackStackEntryCount();
             if (backStackCount > 1) {
                 try {
@@ -588,6 +633,7 @@ public abstract class QMUIFragment extends Fragment {
         }
 
         ViewCompat.setTranslationZ(swipeBackLayout, mBackStackIndex);
+        Log.i(TAG, getClass().getSimpleName() + " onCreateView: mBackStackIndex = " + mBackStackIndex);
 
         swipeBackLayout.setFitsSystemWindows(false);
 
@@ -598,11 +644,23 @@ public abstract class QMUIFragment extends Fragment {
         return swipeBackLayout;
     }
 
+    protected void onBackPressed() {
+        popBackStack();
+    }
+
     protected void popBackStack() {
         if (mEnterAnimationStatus != ANIMATION_ENTER_STATUS_END) {
             return;
         }
         getBaseFragmentActivity().popBackStack();
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return false;
+    }
+
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        return false;
     }
 
     @Override
@@ -695,6 +753,13 @@ public abstract class QMUIFragment extends Fragment {
         return 0;
     }
 
+    /**
+     * called when drag back started.
+     */
+    protected void onDragStart() {
+
+    }
+
     protected int dragBackEdge() {
         return EDGE_LEFT;
     }
@@ -757,6 +822,54 @@ public abstract class QMUIFragment extends Fragment {
             mSwipeBackgroundView.unBind();
             mSwipeBackgroundView = null;
         }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        notifyFragmentVisibleToUserChanged(isParentVisibleToUser() && isVisibleToUser);
+    }
+
+    @Override
+    public boolean isVisibleToUser() {
+        return getUserVisibleHint() && isParentVisibleToUser();
+    }
+
+    /**
+     * @return true if parentFragments is visible to user
+     */
+    private boolean isParentVisibleToUser() {
+        Fragment parentFragment = getParentFragment();
+        while (parentFragment != null) {
+            if (!parentFragment.getUserVisibleHint()) {
+                return false;
+            }
+            parentFragment = parentFragment.getParentFragment();
+        }
+        return true;
+    }
+
+    private void notifyFragmentVisibleToUserChanged(boolean isVisibleToUser) {
+        if (mLazyViewLifecycleOwner != null) {
+            mLazyViewLifecycleOwner.setViewVisible(isVisibleToUser);
+        }
+        if (isAdded()) {
+            List<Fragment> childFragments = getChildFragmentManager().getFragments();
+            for (Fragment fragment : childFragments) {
+                if (fragment instanceof QMUIFragment) {
+                    ((QMUIFragment) fragment).notifyFragmentVisibleToUserChanged(
+                            isVisibleToUser && fragment.getUserVisibleHint());
+                }
+            }
+        }
+    }
+
+    public LifecycleOwner getLazyViewLifecycleOwner() {
+        if (mLazyViewLifecycleOwner == null) {
+            throw new IllegalStateException("Can't access the QMUIFragment View's LifecycleOwner when "
+                    + "getView() is null i.e., before onViewCreated() or after onDestroyView()");
+        }
+        return mLazyViewLifecycleOwner;
     }
 
     /**

@@ -19,7 +19,7 @@ package com.qmuiteam.qmuidemo.fragment.components;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.qmuiteam.qmui.widget.QMUITabSegment;
+import com.qmuiteam.qmui.widget.tab.QMUITabSegment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 import com.qmuiteam.qmuidemo.R;
@@ -87,6 +87,14 @@ public class QDTabSegmentFragment extends BaseFragment {
                     @Override
                     public void onClick(View v) {
                         QDTabSegmentScrollableModeFragment fragment = new QDTabSegmentScrollableModeFragment();
+                        startFragment(fragment);
+                    }
+                })
+                .addItemView(mGroupListView.createItemView(mQDDataManager.getName(
+                        QDTabSegmentSpaceWeightFragment.class)), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        QDTabSegmentSpaceWeightFragment fragment = new QDTabSegmentSpaceWeightFragment();
                         startFragment(fragment);
                     }
                 })

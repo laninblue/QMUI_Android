@@ -17,9 +17,12 @@
 package com.qmuiteam.qmuidemo.fragment.components;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
+import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -30,10 +33,13 @@ import android.widget.Toast;
 
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.util.QMUIViewHelper;
-import com.qmuiteam.qmui.widget.QMUITabSegment;
+import com.qmuiteam.qmui.widget.tab.QMUITabBuilder;
+import com.qmuiteam.qmui.widget.tab.QMUITabIndicator;
+import com.qmuiteam.qmui.widget.tab.QMUITabSegment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmuidemo.R;
 import com.qmuiteam.qmuidemo.base.BaseFragment;
+import com.qmuiteam.qmuidemo.fragment.components.viewpager.QDLazyTestObserver;
 import com.qmuiteam.qmuidemo.lib.Group;
 import com.qmuiteam.qmuidemo.lib.annotation.Widget;
 import com.qmuiteam.qmuidemo.manager.QDDataManager;
@@ -78,7 +84,8 @@ public class QDTabSegmentScrollableModeFragment extends BaseFragment {
             ContentPage page = ContentPage.getPage(position);
             View view = getPageView(page);
             view.setTag(page);
-            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             container.addView(view, params);
             return view;
         }
@@ -115,6 +122,12 @@ public class QDTabSegmentScrollableModeFragment extends BaseFragment {
         return rootView;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLazyViewLifecycleOwner().getLifecycle().addObserver(new QDLazyTestObserver("QDTabSegment"));
+    }
+
     private void initTopBar() {
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,11 +149,13 @@ public class QDTabSegmentScrollableModeFragment extends BaseFragment {
     private void initTabAndPager() {
         mContentViewPager.setAdapter(mPagerAdapter);
         mContentViewPager.setCurrentItem(mDestPage.getPosition(), false);
+        QMUITabBuilder tabBuilder = mTabSegment.tabBuilder();
         for (int i = 0; i < mCurrentItemCount; i++) {
-            mTabSegment.addTab(new QMUITabSegment.Tab("Item " + (i + 1)));
+            mTabSegment.addTab(tabBuilder.setText("Item " + (i + 1)).build());
         }
         int space = QMUIDisplayHelper.dp2px(getContext(), 16);
-        mTabSegment.setHasIndicator(true);
+        mTabSegment.setIndicator(new QMUITabIndicator(
+                QMUIDisplayHelper.dp2px(getContext(), 2), false, true));
         mTabSegment.setMode(QMUITabSegment.MODE_SCROLLABLE);
         mTabSegment.setItemSpaceInScrollMode(space);
         mTabSegment.setupWithViewPager(mContentViewPager, false);
@@ -170,14 +185,16 @@ public class QDTabSegmentScrollableModeFragment extends BaseFragment {
 
     private void reduceTabCount() {
         if (mCurrentItemCount <= 1) {
-            Toast.makeText(getContext(), "Only the last one, don't reduce it anymore!!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Only the last one, don't reduce it anymore!!!",
+                    Toast.LENGTH_SHORT).show();
             return;
         }
         mCurrentItemCount--;
         mPagerAdapter.notifyDataSetChanged();
         mTabSegment.reset();
+        QMUITabBuilder tabBuilder = mTabSegment.tabBuilder();
         for (int i = 0; i < mCurrentItemCount; i++) {
-            mTabSegment.addTab(new QMUITabSegment.Tab("Item " + (i + 1)));
+            mTabSegment.addTab(tabBuilder.setText("Item " + (i + 1)).build());
         }
         mTabSegment.notifyDataChanged();
     }

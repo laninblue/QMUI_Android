@@ -16,9 +16,9 @@
 -->
 
 <com.qmuiteam.qmui.widget.QMUIWindowInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+                                                xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent">
 
     <ScrollView
         android:id="@+id/contentWrap"
@@ -39,9 +39,9 @@
                 android:text="@string/circularImageView_item_xml_circle_title"/>
 
             <com.qmuiteam.qmui.widget.QMUIRadiusImageView
-                android:clickable="true"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:clickable="true"
                 android:src="@mipmap/example_image6"
                 app:qmui_border_color="?attr/qmui_config_color_gray_6"
                 app:qmui_border_width="1px"
@@ -56,9 +56,9 @@
                 android:text="@string/circularImageView_item_xml_oval_title"/>
 
             <com.qmuiteam.qmui.widget.QMUIRadiusImageView
-                android:clickable="true"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:clickable="true"
                 android:src="@mipmap/example_image6"
                 app:qmui_border_color="?attr/qmui_config_color_gray_6"
                 app:qmui_border_width="1px"
@@ -73,9 +73,9 @@
                 android:text="@string/circularImageView_item_xml_round_rect_title"/>
 
             <com.qmuiteam.qmui.widget.QMUIRadiusImageView
-                android:clickable="true"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:clickable="true"
                 android:src="@mipmap/example_image6"
                 app:qmui_border_color="?attr/qmui_config_color_gray_6"
                 app:qmui_border_width="1px"
@@ -90,10 +90,10 @@
                 android:text="@string/circularImageView_modify_tip"/>
 
             <com.qmuiteam.qmui.widget.QMUIRadiusImageView
-                android:clickable="true"
                 android:id="@+id/radiusImageView"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
+                android:clickable="true"
                 android:src="@mipmap/example_image6"
                 app:qmui_border_color="?attr/qmui_config_color_gray_6"
                 app:qmui_border_width="1px"

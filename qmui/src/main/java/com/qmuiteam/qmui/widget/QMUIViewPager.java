@@ -21,16 +21,17 @@ import android.database.DataSetObserver;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Parcelable;
-import androidx.annotation.NonNull;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.core.view.ViewCompat;
-import androidx.viewpager.widget.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.qmuiteam.qmui.util.QMUIWindowInsetHelper;
+
+import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * @author cginechen
@@ -54,6 +55,9 @@ public class QMUIViewPager extends ViewPager implements IWindowInsetLayout {
         super(context, attrs);
         mQMUIWindowInsetHelper = new QMUIWindowInsetHelper(this, this);
     }
+
+
+
 
     public void setSwipeable(boolean enable) {
         mIsSwipeable = enable;
@@ -161,7 +165,8 @@ public class QMUIViewPager extends ViewPager implements IWindowInsetLayout {
         }
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        @NonNull
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
             int realPosition = position;
             if (mEnableLoop && mAdapter.getCount() != 0) {
                 realPosition = position % mAdapter.getCount();
@@ -170,7 +175,7 @@ public class QMUIViewPager extends ViewPager implements IWindowInsetLayout {
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             int realPosition = position;
             if (mEnableLoop && mAdapter.getCount() != 0) {
                 realPosition = position % mAdapter.getCount();
@@ -179,7 +184,7 @@ public class QMUIViewPager extends ViewPager implements IWindowInsetLayout {
         }
 
         @Override
-        public boolean isViewFromObject(View view, Object object) {
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
             return mAdapter.isViewFromObject(view, object);
         }
 
@@ -195,12 +200,12 @@ public class QMUIViewPager extends ViewPager implements IWindowInsetLayout {
         }
 
         @Override
-        public void startUpdate(ViewGroup container) {
+        public void startUpdate(@NonNull ViewGroup container) {
             mAdapter.startUpdate(container);
         }
 
         @Override
-        public void finishUpdate(ViewGroup container) {
+        public void finishUpdate(@NonNull ViewGroup container) {
             mAdapter.finishUpdate(container);
         }
 
@@ -237,7 +242,7 @@ public class QMUIViewPager extends ViewPager implements IWindowInsetLayout {
         }
 
         @Override
-        public int getItemPosition(Object object) {
+        public int getItemPosition(@NonNull Object object) {
             return mAdapter.getItemPosition(object);
         }
     }

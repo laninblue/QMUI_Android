@@ -74,8 +74,13 @@
     <declare-styleable name="QMUITabSegment">
         <attr name="qmui_tab_indicator_height" format="dimension"/>
         <attr name="qmui_tab_has_indicator" format="boolean"/>
-        <attr name="android:textSize"/>
         <attr name="qmui_tab_indicator_top" format="boolean"/>
+        <attr name="qmui_tab_indicator_with_follow_content" format="boolean"/>
+        <attr name="android:textSize"/>
+        <attr name="qmui_tab_normal_text_size" format="dimension"/>
+        <attr name="qmui_tab_selected_text_size" format="dimension"/>
+        <attr name="qmui_tab_normal_color" format="color|reference"/>
+        <attr name="qmui_tab_selected_color" format="color|reference"/>
         <attr name="qmui_tab_mode" format="enum">
             <enum name="scrollable" value="0"/>
             <enum name="fixed" value="1"/>
@@ -87,7 +92,6 @@
             <enum name="right" value="2"/>
             <enum name="bottom" value="3"/>
         </attr>
-        <attr name="qmui_tab_typeface_provider" format="string"/>
     </declare-styleable>
     <attr name="QMUITabSegmentStyle" format="reference"/>
 
@@ -175,17 +179,35 @@
     <!--************** QMUIRadiusImageView ****************-->
     <attr name="qmui_border_width" format="dimension"/>
     <attr name="qmui_border_color" format="color"/>
+    <attr name="qmui_selected_mask_color" format="color"/>
+    <attr name="qmui_selected_border_color" format="color"/>
+    <attr name="qmui_selected_border_width" format="dimension"/>
+    <attr name="qmui_corner_radius" format="dimension"/>
+    <attr name="qmui_is_oval" format="boolean"/>
+    <attr name="qmui_is_circle" format="boolean"/>
+    <attr name="qmui_is_touch_select_mode_enabled" format="boolean"/>
     <declare-styleable name="QMUIRadiusImageView">
         <attr name="qmui_border_width"/>
         <attr name="qmui_border_color"/>
-        <attr name="qmui_selected_mask_color" format="color"/>
-        <attr name="qmui_selected_border_color" format="color"/>
-        <attr name="qmui_selected_border_width" format="dimension"/>
-        <attr name="qmui_corner_radius" format="dimension"/>
-        <attr name="qmui_is_oval" format="boolean"/>
-        <attr name="qmui_is_circle" format="boolean"/>
-        <attr name="qmui_is_touch_select_mode_enabled" format="boolean"/>
+        <attr name="qmui_selected_mask_color"/>
+        <attr name="qmui_selected_border_color"/>
+        <attr name="qmui_selected_border_width"/>
+        <attr name="qmui_corner_radius"/>
+        <attr name="qmui_is_oval"/>
+        <attr name="qmui_is_circle"/>
+        <attr name="qmui_is_touch_select_mode_enabled"/>
     </declare-styleable>
+    <declare-styleable name="QMUIRadiusImageView2">
+        <attr name="qmui_border_width"/>
+        <attr name="qmui_border_color"/>
+        <attr name="qmui_selected_mask_color"/>
+        <attr name="qmui_selected_border_color"/>
+        <attr name="qmui_selected_border_width"/>
+        <attr name="qmui_corner_radius"/>
+        <attr name="qmui_is_circle"/>
+        <attr name="qmui_is_touch_select_mode_enabled"/>
+    </declare-styleable>
+
     <attr name="QMUIRadiusImageViewStyle" format="reference"/>
 
     <!--************** QMUIQQFaceView ****************-->
