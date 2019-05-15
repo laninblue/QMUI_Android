@@ -16,6 +16,7 @@
 
 package com.qmuiteam.qmuidemo.fragment.lab;
 
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -23,8 +24,7 @@ import android.widget.Toast;
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomAreaBehavior;
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomRecyclerView;
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopAreaBehavior;
-import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopWebView;
-import com.qmuiteam.qmui.widget.webview.QMUIWebView;
+import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopRecyclerView;
 import com.qmuiteam.qmuidemo.base.BaseRecyclerAdapter;
 import com.qmuiteam.qmuidemo.base.RecyclerViewHolder;
 import com.qmuiteam.qmuidemo.lib.Group;
@@ -39,21 +39,22 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-@Widget(group = Group.Other, name = "webview + recyclerview")
-public class QDContinuousNestedScroll1Fragment extends QDContinuousNestedScrollBaseFragment {
+@Widget(group = Group.Other, name = "recyclerview + recyclerview")
+public class QDContinuousNestedScroll3Fragment extends QDContinuousNestedScrollBaseFragment {
 
-    private QMUIWebView mNestedWebView;
+    private QMUIContinuousNestedTopRecyclerView mTopRecyclerView;
     private RecyclerView mRecyclerView;
     private BaseRecyclerAdapter<String> mAdapter;
 
     @Override
     protected void initCoordinatorLayout() {
-        mNestedWebView = new QMUIContinuousNestedTopWebView(getContext());
+        mTopRecyclerView = new QMUIContinuousNestedTopRecyclerView(getContext());
+        mTopRecyclerView.setBackgroundColor(Color.LTGRAY);
         int matchParent = ViewGroup.LayoutParams.MATCH_PARENT;
         CoordinatorLayout.LayoutParams webViewLp = new CoordinatorLayout.LayoutParams(
                 matchParent, matchParent);
         webViewLp.setBehavior(new QMUIContinuousNestedTopAreaBehavior(getContext()));
-        mCoordinatorLayout.setTopAreaView(mNestedWebView, webViewLp);
+        mCoordinatorLayout.setTopAreaView(mTopRecyclerView, webViewLp);
 
         mRecyclerView = new QMUIContinuousNestedBottomRecyclerView(getContext());
         CoordinatorLayout.LayoutParams recyclerViewLp = new CoordinatorLayout.LayoutParams(
@@ -61,7 +62,13 @@ public class QDContinuousNestedScroll1Fragment extends QDContinuousNestedScrollB
         recyclerViewLp.setBehavior(new QMUIContinuousNestedBottomAreaBehavior());
         mCoordinatorLayout.setBottomAreaView(mRecyclerView, recyclerViewLp);
 
-        mNestedWebView.loadUrl("https://mp.weixin.qq.com/s/zgfLOMD2JfZJKfHx-5BsBg");
+        mTopRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()) {
+            @Override
+            public RecyclerView.LayoutParams generateDefaultLayoutParams() {
+                return new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()) {
             @Override
@@ -88,26 +95,17 @@ public class QDContinuousNestedScroll1Fragment extends QDContinuousNestedScrollB
                 Toast.makeText(getContext(), "click position=" + pos, Toast.LENGTH_SHORT).show();
             }
         });
+        mTopRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setAdapter(mAdapter);
         onDataLoaded();
     }
 
     private void onDataLoaded() {
         List<String> data = new ArrayList<>(Arrays.asList("Helps", "Maintain", "Liver",
-                "Health", "Function", "Supports", "Healthy", "Fat", "Metabolism",
-                "Nuturally", "Bracket", "Refrigerator", "Bathtub", "Wardrobe", "Comb",
-                "Apron", "Carpet", "Bolster", "Pillow", "Cushion"));
+                "Health", "Function", "Supports", "Healthy", "Fat", "Metabolism", "Nuturally",
+                "Bracket", "Refrigerator", "Bathtub", "Wardrobe", "Comb", "Apron", "Carpet",
+                "Bolster", "Pillow", "Cushion"));
         Collections.shuffle(data);
         mAdapter.setData(data);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mNestedWebView != null) {
-            mCoordinatorLayout.removeView(mNestedWebView);
-            mNestedWebView.destroy();
-            mNestedWebView = null;
-        }
     }
 }

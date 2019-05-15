@@ -16,16 +16,27 @@
 
 package com.qmuiteam.qmui.nestedScroll;
 
-public interface IQMUIContinuousNestedTopView extends IQMUIContinuousNestedScrollCommon {
-    /**
-     * consume scroll
-     *
-     * @param dyUnconsumed the delta value to consume
-     * @return the remain unconsumed value
-     */
-    int consumeScroll(int dyUnconsumed);
+import android.view.View;
 
-    int getCurrentScroll();
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
-    int getScrollOffsetRange();
+public interface IQMUIContinuousNestedScrollCommon {
+
+    int SCROLL_STATE_IDLE = RecyclerView.SCROLL_STATE_IDLE;
+    int SCROLL_STATE_DRAGGING = RecyclerView.SCROLL_STATE_DRAGGING;
+    int SCROLL_STATE_SETTLING = RecyclerView.SCROLL_STATE_SETTLING;
+
+    @Nullable
+    Object saveScrollInfo();
+
+    void restoreScrollInfo(@Nullable Object scrollInfo);
+
+    void injectScrollNotifier(OnScrollNotifier notifier);
+
+    interface OnScrollNotifier {
+        void notify(int innerOffset, int innerRange);
+
+        void onScrollStateChange(View view, int newScrollState);
+    }
 }

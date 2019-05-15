@@ -1,3 +1,19 @@
+/*
+ * Tencent is pleased to support the open source community by making QMUI_Android available.
+ *
+ * Copyright (C) 2017-2018 THL A29 Limited, a Tencent company. All rights reserved.
+ *
+ * Licensed under the MIT License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.qmuiteam.qmui.nestedScroll;
 
 import android.content.Context;
@@ -35,6 +51,7 @@ public abstract class QMUIContinuousNestedBottomDelegateLayout extends QMUIFrame
     private View mContentView;
     private QMUIViewOffsetHelper mHeaderViewOffsetHelper;
     private QMUIViewOffsetHelper mContentViewOffsetHelper;
+    private IQMUIContinuousNestedBottomView.OnScrollNotifier mOnScrollNotifier;
 
     private static final int INVALID_POINTER = -1;
     private boolean isBeingDragged;
@@ -84,6 +101,26 @@ public abstract class QMUIContinuousNestedBottomDelegateLayout extends QMUIFrame
 
     public View getContentView() {
         return mContentView;
+    }
+
+    public int getOffsetCurrent() {
+        return -mHeaderViewOffsetHelper.getTopAndBottomOffset();
+    }
+
+    public int getOffsetRange() {
+        return -getMiniOffset();
+    }
+
+    private int getMiniOffset() {
+        IQMUIContinuousNestedBottomView b = (IQMUIContinuousNestedBottomView) mContentView;
+        int contentHeight = b.getContentHeight();
+        FrameLayout.LayoutParams headerLp = (LayoutParams) mHeaderView.getLayoutParams();
+        int minOffset = -mHeaderView.getHeight() - headerLp.bottomMargin + getHeaderStickyHeight();
+        if (contentHeight != IQMUIContinuousNestedBottomView.HEIGHT_IS_ENOUGH_TO_SCROLL) {
+            minOffset += mContentView.getHeight() - contentHeight;
+            minOffset = Math.min(minOffset, 0);
+        }
+        return minOffset;
     }
 
     @Override
@@ -145,14 +182,10 @@ public abstract class QMUIContinuousNestedBottomDelegateLayout extends QMUIFrame
 
     private int offsetBy(int dyUnConsumed) {
         int canConsume = 0;
-        IQMUIContinuousNestedBottomView b = (IQMUIContinuousNestedBottomView) mContentView;
-        int contentHeight = b.getContentHeight();
+
+
         FrameLayout.LayoutParams headerLp = (LayoutParams) mHeaderView.getLayoutParams();
-        int minOffset = -mHeaderView.getHeight() - headerLp.bottomMargin + getHeaderStickyHeight();
-        if (contentHeight != IQMUIContinuousNestedBottomView.HEIGHT_IS_ENOUGH_TO_SCROLL) {
-            minOffset += mContentView.getHeight() - contentHeight;
-            minOffset = Math.min(minOffset, 0);
-        }
+        int minOffset = getMiniOffset();
         if (dyUnConsumed > 0) {
             canConsume = Math.min(mHeaderView.getTop() - minOffset, dyUnConsumed);
         } else if (dyUnConsumed < 0) {
@@ -162,18 +195,94 @@ public abstract class QMUIContinuousNestedBottomDelegateLayout extends QMUIFrame
             mHeaderViewOffsetHelper.setTopAndBottomOffset(mHeaderViewOffsetHelper.getTopAndBottomOffset() - canConsume);
             mContentViewOffsetHelper.setTopAndBottomOffset(mContentViewOffsetHelper.getTopAndBottomOffset() - canConsume);
         }
+        mOnScrollNotifier.notify(-mHeaderViewOffsetHelper.getTopAndBottomOffset(),
+                mHeaderView.getHeight() + ((IQMUIContinuousNestedBottomView) mContentView).getScrollOffsetRange());
         return dyUnConsumed - canConsume;
     }
 
+
     @Override
     public void consumeScroll(int dy) {
-        mScrollConsumed[0] = 0;
-        mScrollConsumed[1] = 0;
-        dispatchNestedPreScroll(0, dy, mScrollConsumed, null, ViewCompat.TYPE_NON_TOUCH);
-        int unConsumed = dy - mScrollConsumed[1];
-        int remain = offsetBy(unConsumed);
-        dispatchNestedScroll(0, unConsumed - remain, 0,
-                remain, null, ViewCompat.TYPE_NON_TOUCH);
+        if (dy == Integer.MAX_VALUE) {
+            offsetBy(dy);
+            ((IQMUIContinuousNestedBottomView) mContentView).consumeScroll(Integer.MAX_VALUE);
+            return;
+        } else if (dy == Integer.MIN_VALUE) {
+            ((IQMUIContinuousNestedBottomView) mContentView).consumeScroll(Integer.MIN_VALUE);
+            offsetBy(dy);
+            return;
+        }
+        ((IQMUIContinuousNestedBottomView) mContentView).consumeScroll(dy);
+    }
+
+    @Override
+    public void smoothScrollYBy(int dy, int duration) {
+        ((IQMUIContinuousNestedBottomView) mContentView).smoothScrollYBy(dy, duration);
+    }
+
+    @Override
+    public void stopScroll() {
+        ((IQMUIContinuousNestedBottomView) mContentView).stopScroll();
+    }
+
+    @Override
+    public int getCurrentScroll() {
+        return -mHeaderViewOffsetHelper.getTopAndBottomOffset() +
+                ((IQMUIContinuousNestedBottomView) mContentView).getCurrentScroll();
+    }
+
+    @Override
+    public int getScrollOffsetRange() {
+        if (getContentHeight() != HEIGHT_IS_ENOUGH_TO_SCROLL) {
+            return 0;
+        }
+        return mHeaderView.getHeight() +
+                ((IQMUIContinuousNestedBottomView) mContentView).getScrollOffsetRange();
+    }
+
+    @Override
+    public void injectScrollNotifier(final OnScrollNotifier notifier) {
+        mOnScrollNotifier = notifier;
+        if (mContentView instanceof IQMUIContinuousNestedBottomView) {
+            ((IQMUIContinuousNestedBottomView) mContentView).injectScrollNotifier(new OnScrollNotifier() {
+                @Override
+                public void notify(int innerOffset, int innerRange) {
+                    notifier.notify(innerOffset - mHeaderView.getTop(),
+                            innerRange + mHeaderView.getHeight());
+                }
+
+                @Override
+                public void onScrollStateChange(View view, int newScrollState) {
+                    notifier.onScrollStateChange(view, newScrollState);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void restoreScrollInfo(Object scrollInfo) {
+        if (scrollInfo instanceof ScrollInfo) {
+            ScrollInfo si = (ScrollInfo) scrollInfo;
+            mHeaderViewOffsetHelper.setTopAndBottomOffset(si.topBottomOffset);
+            mContentViewOffsetHelper.setTopAndBottomOffset(si.topBottomOffset);
+            ((IQMUIContinuousNestedBottomView) mContentView).restoreScrollInfo(si.delegateScrollInfo);
+        }
+    }
+
+    @Override
+    public Object saveScrollInfo() {
+        return new ScrollInfo(mHeaderViewOffsetHelper.getTopAndBottomOffset(),
+                ((IQMUIContinuousNestedBottomView) mContentView).saveScrollInfo());
+    }
+
+    public static class ScrollInfo {
+        int topBottomOffset;
+        Object delegateScrollInfo;
+
+        public ScrollInfo(int topBottomOffset, Object delegateScrollInfo) {
+            this.topBottomOffset = topBottomOffset;
+            this.delegateScrollInfo = delegateScrollInfo;
+        }
     }
 
     // NestedScrollingChild2
@@ -289,7 +398,7 @@ public abstract class QMUIContinuousNestedBottomDelegateLayout extends QMUIFrame
                                   int type) {
         dispatchNestedPreScroll(dx, dy, consumed, null, type);
         int unconsumed = dy - consumed[1];
-        if (unconsumed != 0 && unconsumed > 0) {
+        if (unconsumed > 0) {
             consumed[1] += unconsumed - offsetBy(unconsumed);
         }
     }
@@ -465,6 +574,10 @@ public abstract class QMUIContinuousNestedBottomDelegateLayout extends QMUIFrame
 
                 if (isBeingDragged) {
                     lastMotionY = y;
+                    if (dy < 0 && ((IQMUIContinuousNestedBottomView) mContentView).getCurrentScroll() > 0) {
+                        // the content view can scroll up, prevent drag
+                        return true;
+                    }
                     mScrollConsumed[0] = 0;
                     mScrollConsumed[1] = 0;
                     if (dispatchNestedPreScroll(0, dy, mScrollConsumed, mScrollOffset)) {
@@ -479,7 +592,6 @@ public abstract class QMUIContinuousNestedBottomDelegateLayout extends QMUIFrame
                         vtev.offsetLocation(0, mScrollOffset[1]);
                         mNestedOffsetY += mScrollOffset[1];
                     }
-
                 }
                 break;
             }
@@ -540,6 +652,9 @@ public abstract class QMUIContinuousNestedBottomDelegateLayout extends QMUIFrame
                 final int y = scroller.getCurrY();
                 int unconsumedY = y - mLastFlingY;
                 mLastFlingY = y;
+                if (!mChildHelper.hasNestedScrollingParent(ViewCompat.TYPE_NON_TOUCH)) {
+                    startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL, ViewCompat.TYPE_NON_TOUCH);
+                }
                 consumeScroll(unconsumedY);
                 postOnAnimation();
             }
@@ -586,6 +701,5 @@ public abstract class QMUIContinuousNestedBottomDelegateLayout extends QMUIFrame
             removeCallbacks(this);
             mOverScroller.abortAnimation();
         }
-
     }
 }
