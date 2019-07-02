@@ -17,9 +17,12 @@
 package com.qmuiteam.qmui.nestedScroll;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.AttributeSet;
 
 import com.qmuiteam.qmui.layout.QMUILinearLayout;
+
+import androidx.annotation.NonNull;
 
 public class QMUIContinuousNestedTopLinearLayout extends QMUILinearLayout implements IQMUIContinuousNestedTopView {
 
@@ -58,12 +61,12 @@ public class QMUIContinuousNestedTopLinearLayout extends QMUILinearLayout implem
     }
 
     @Override
-    public void restoreScrollInfo(Object scrollInfo) {
+    public void restoreScrollInfo(@NonNull Bundle bundle) {
 
     }
 
     @Override
-    public Object saveScrollInfo() {
-        return null;
+    public void saveScrollInfo(@NonNull Bundle bundle) {
+
     }
 }
