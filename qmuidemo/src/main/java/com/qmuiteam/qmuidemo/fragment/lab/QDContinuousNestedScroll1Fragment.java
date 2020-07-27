@@ -16,10 +16,13 @@
 
 package com.qmuiteam.qmuidemo.fragment.lab;
 
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.qmuiteam.qmui.arch.annotation.LatestVisitRecord;
+import com.qmuiteam.qmui.arch.record.RecordArgumentEditor;
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomAreaBehavior;
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedBottomRecyclerView;
 import com.qmuiteam.qmui.nestedScroll.QMUIContinuousNestedTopAreaBehavior;
@@ -35,16 +38,27 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 @Widget(group = Group.Other, name = "webview + recyclerview")
+@LatestVisitRecord
 public class QDContinuousNestedScroll1Fragment extends QDContinuousNestedScrollBaseFragment {
 
     private QMUIWebView mNestedWebView;
     private RecyclerView mRecyclerView;
     private BaseRecyclerAdapter<String> mAdapter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle arguments = getArguments();
+        if (arguments != null && arguments.getInt("fragment_test") == 20) {
+            Toast.makeText(getContext(), "恢复到最近阅读(Int)", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     protected void initCoordinatorLayout() {
@@ -99,6 +113,11 @@ public class QDContinuousNestedScroll1Fragment extends QDContinuousNestedScrollB
                 "Apron", "Carpet", "Bolster", "Pillow", "Cushion"));
         Collections.shuffle(data);
         mAdapter.setData(data);
+    }
+
+    @Override
+    public void onCollectLatestVisitArgument(RecordArgumentEditor editor) {
+        editor.putInt("fragment_test", 20);
     }
 
     @Override

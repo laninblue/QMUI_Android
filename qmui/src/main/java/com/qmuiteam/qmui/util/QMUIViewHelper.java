@@ -24,6 +24,7 @@ import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -38,6 +39,8 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
+
 import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +54,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.qmuiteam.qmui.R;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 
 import java.util.ArrayList;
@@ -137,7 +141,7 @@ public class QMUIViewHelper {
 
     public static void setBackgroundKeepingPadding(View view, Drawable drawable) {
         int[] padding = new int[]{view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom()};
-        setBackground(view, drawable);
+        view.setBackground(drawable);
         view.setPadding(padding[0], padding[1], padding[2], padding[3]);
     }
 
@@ -584,6 +588,39 @@ public class QMUIViewHelper {
         }
     }
 
+    public static void updateChildrenOffsetHelperOnLayout(@NonNull ViewGroup viewGroup){
+        View view;
+        QMUIViewOffsetHelper offsetHelper;
+        for(int i = 0; i < viewGroup.getChildCount(); i++){
+            view = viewGroup.getChildAt(i);
+            offsetHelper = getOffsetHelper(view);
+            if(offsetHelper != null){
+                offsetHelper.onViewLayout();
+            }
+        }
+    }
+
+    @Nullable
+    public static QMUIViewOffsetHelper getOffsetHelper(@NonNull View view){
+        Object tag = view.getTag(R.id.qmui_view_offset_helper);
+        if(tag instanceof QMUIViewOffsetHelper){
+            return (QMUIViewOffsetHelper) tag;
+        }
+        return null;
+    }
+
+    @NonNull
+    public static QMUIViewOffsetHelper getOrCreateOffsetHelper(@NonNull View view){
+        Object tag = view.getTag(R.id.qmui_view_offset_helper);
+        if(tag instanceof QMUIViewOffsetHelper){
+            return (QMUIViewOffsetHelper) tag;
+        }else{
+            QMUIViewOffsetHelper ret = new QMUIViewOffsetHelper(view);
+            view.setTag(R.id.qmui_view_offset_helper, ret);
+            return ret;
+        }
+    }
+
     /**
      * 判断是否需要对 LineSpacingExtra 进行额外的兼容处理
      * 安卓 5.0 以下版本中，LineSpacingExtra 在最后一行也会产生作用，因此会多出一个 LineSpacingExtra 的空白，可以通过该方法判断后进行兼容处理
@@ -687,6 +724,10 @@ public class QMUIViewHelper {
     }
 
 
+    /**
+     * please use ImageViewCompat.setImageTintList() replace this.
+     */
+    @Deprecated
     public static ColorFilter setImageViewTintColor(ImageView imageView, @ColorInt int tintColor) {
         LightingColorFilter colorFilter = new LightingColorFilter(Color.argb(255, 0, 0, 0), tintColor);
         imageView.setColorFilter(colorFilter);
